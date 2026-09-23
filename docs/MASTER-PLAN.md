@@ -1,4 +1,4 @@
-# AI Software Architect — tam kapsam planı
+# Ariadne — tam kapsam planı
 
 Kaynak: [source-design.md](source-design.md), bölüm 1–57. Amaç CV/GitHub'da kanıtlanabilir, çalışan tam üründür. Kaynak belgedeki MVP/V1/V2/V3/V4 ayrımı burada teslim kapsamını daraltmaz; hepsi yapılacak iş olarak modellenmiştir. Bu dosya uygulama sonucu değil, iş haritasıdır. Ürün kodu, test kanıtı ve demo henüz yapılmadı.
 

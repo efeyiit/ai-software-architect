@@ -12,7 +12,7 @@ Bu proje tüm kaynak kapsamıyla, CV/GitHub önceliği ve token verimliliği gö
 | Anlatım | ANLAT-001, Luna | Kısa özet ve detaylı proje açıklaması |
 | GitHub kayıtları | GIT-001, Sol; rutin işler Luna'ya devredilebilir | Repo, staging, commit, push ve uzak kayıt doğrulama |
 
-Sohbet isimleri: `ASA | GÖREV-ID | Luna/Sol | Kısa iş`. Ana sohbet `ASA | MERKEZ | Astra | Proje sorumlusu`.
+Sohbet isimleri: `Ariadne | GÖREV-ID | Luna/Sol | Kısa iş`. Ana sohbet `Ariadne | MERKEZ | Astra | Proje sorumlusu`.
 
 ## Teslim zinciri
 

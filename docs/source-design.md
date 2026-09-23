@@ -1,5 +1,5 @@
 
-# AI Software Architect  
+# Ariadne  
 ## Software Design Document
 
 **Project Type:** AI-Powered Developer Tool / SaaS  
@@ -11,7 +11,7 @@
 
 # 1. Project Overview
 
-AI Software Architect, bir GitHub repository'sini analiz ederek yazılım geliştiricilere projenin mimarisi, kod kalitesi, bağımlılıkları, test yapısı ve dokümantasyonu hakkında otomatik analiz sağlayan AI destekli bir geliştirici aracıdır.
+Ariadne, bir GitHub repository'sini analiz ederek yazılım geliştiricilere projenin mimarisi, kod kalitesi, bağımlılıkları, test yapısı ve dokümantasyonu hakkında otomatik analiz sağlayan AI destekli bir geliştirici aracıdır.
 
 Kullanıcı sisteme bir GitHub repository bağlantısı verir.
 
@@ -64,7 +64,7 @@ Bir geliştiricinin aşağıdaki soruların cevaplarını bulması uzun sürebil
 - API yapısı nasıl?
 - Projeyi çalıştırmak için ne gerekiyor?
 
-AI Software Architect bu süreci otomatikleştirmeyi amaçlar.
+Ariadne bu süreci otomatikleştirmeyi amaçlar.
 
 ---
 
@@ -2137,7 +2137,7 @@ Bu, projenin temel ürün deneyimidir.
 
 Proje tamamlandığında CV'de şu şekilde anlatılabilir:
 
-**AI Software Architect — AI-powered repository analysis platform**
+**Ariadne — AI-powered repository analysis platform**
 
 Developed an AI-powered developer tool capable of analyzing GitHub repositories, extracting code structure using AST parsing, visualizing dependencies, detecting code-quality issues, and enabling repository-level semantic search using RAG.
 

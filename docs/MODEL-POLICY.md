@@ -1,6 +1,6 @@
 # Model ve inceleme kuralları
 
-Ana Astra sohbeti **proje sorumlusu**; Luna/Sol görev sohbetleri **çalışan** olarak adlandırılır. Görev adı `ASA | <görev ID> | <Luna/Sol> | <kısa iş>`; bu planlama görevi `ASA | PLAN-001 | Sol | Görev planı ve Orvant`.
+Ana Astra sohbeti **proje sorumlusu**; Luna/Sol görev sohbetleri **çalışan** olarak adlandırılır. Görev adı `Ariadne | <görev ID> | <Luna/Sol> | <kısa iş>`; bu planlama görevi `Ariadne | PLAN-001 | Sol | Görev planı ve Orvant`.
 
 - **gpt-6-luna low/medium:** Net sözleşmeli UI sunumu, basit mapping/config ve dokümantasyon. Medium, birden çok UI durumunun birleştiği kartlarda.
 - **gpt-6-sol medium:** Parser, import resolution, backend analizi, API/entegrasyon, ölçüm ve çok modüllü işler.
