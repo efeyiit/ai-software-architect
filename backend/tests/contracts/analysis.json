@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "analysis_id": "analysis-001",
+  "snapshot": {
+    "repository_id": "repo-001",
+    "commit_sha": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "status": "succeeded",
+  "findings": [
+    {
+      "id": "finding-001",
+      "source": "static",
+      "issue_type": "DEEP_NESTING",
+      "severity": "medium",
+      "location": {"path": "src/core/worker.py", "start_line": 12, "end_line": 18},
+      "description": "Nested conditions increase complexity.",
+      "suggestion": "Extract a guard clause."
+    },
+    {
+      "id": "finding-002",
+      "source": "ai",
+      "issue_type": "SRP_VIOLATION",
+      "severity": "low",
+      "location": {"path": "src/core/worker.py", "start_line": 24, "end_line": 24},
+      "description": "Possible mixed responsibilities; review this interpretation.",
+      "suggestion": null
+    }
+  ],
+  "errors": []
+}
