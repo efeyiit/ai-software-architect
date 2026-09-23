@@ -30,3 +30,14 @@ __pycache__/
 .ruff_cache/
 .DS_Store
 Thumbs.db
+
+# Local coordination documents
+AGENTS.md
+docs/WORKFLOW.md
+docs/GITHUB-WORKFLOW.md
+docs/MODEL-POLICY.md
+docs/MASTER-PLAN.md
+docs/COVERAGE.md
+docs/TASKS.md
+docs/tasks/
+docs/ORVANT-RENAME-FOLLOWUP.md

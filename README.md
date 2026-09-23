@@ -1,11 +1,32 @@
 # Ariadne
 
-Ariadne is a planned developer tool for analyzing a GitHub repository and presenting evidence about its structure, dependencies, quality, tests, security, and architecture. The intended product also includes source linked explanations, diagrams, documentation assistance, and a repository chat.
+Ariadne is a developer tool for exploring a GitHub repository through its architecture, dependencies, code quality, tests, security findings, and source-linked explanations. Its name comes from Ariadne's thread through the labyrinth: each finding should lead back to the code and evidence that explains it.
 
-The name comes from Ariadne's thread through the labyrinth: the intended experience leads each finding back to the source and evidence that explains it.
+**Status: early implementation.** The FastAPI and React shells, a shared analysis-result contract, and targeted contract tests are in place. Repository ingestion, automated analysis, AI features, and a complete product demo are still planned.
 
-**Current status: planning.** This repository contains the source design and a task plan. There is no working application, verified analysis result, or product demo yet. Proposed technologies and architecture decisions in the plan are subject to implementation and review.
+## Run the current foundation
 
-The [master plan](docs/MASTER-PLAN.md) maps the full design to 39 task cards in [docs/tasks](docs/tasks). [Coverage](docs/COVERAGE.md) tracks the design sections, and [the workflow](docs/WORKFLOW.md) describes how tasks move from implementation through verification. GitHub publication rules are in [docs/GITHUB-WORKFLOW.md](docs/GITHUB-WORKFLOW.md).
+From `backend/`:
 
-The intended safety boundary is to treat analyzed repository content as data, keep evidence separate from AI interpretation, and avoid executing analyzed code by default. These are design requirements, not verified product capabilities.
+```sh
+uv sync
+uv run uvicorn app.main:app --reload
+uv run pytest -q
+```
+
+From `frontend/`:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm test
+pnpm build
+```
+
+The API currently exposes `/health`; the frontend displays a minimal application shell. See the [T01 verification record](docs/evidence/T01.md) for the tested behavior and its limits.
+
+## Product direction
+
+The [product roadmap](docs/product-roadmap.md) summarizes the planned capabilities. The [source design](docs/source-design.md) gives the full intended scope, and [architecture decisions](docs/architecture-decisions.md) describe the implemented foundation.
+
+The design calls for source evidence to remain distinct from AI interpretation and for analyzed repository code not to run by default. These are product requirements; future capabilities need their own implementation and verification.
