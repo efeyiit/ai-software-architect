@@ -16,4 +16,6 @@ Bu proje public GitHub reposunda görev bazında izlenir. Tek Git yazıcısı GI
 
 `.project/` yerel Orvant state ve üretilmiş görünümler içerir; public repoya eklenmez. Kişisel vault, Codex oturumları, ekler, `.env`, API anahtarları, credential dosyaları, müşteri verisi, yerel loglar, çalışma taslakları ve `outputs/` yayımlanmaz. Public belgelerde repo köküne göre göreli yollar kullanılır. Şüpheli içerik bulunduğunda değerleri çıktıya basmadan yayın paketi durdurulur ve proje sorumlusuna bildirilir.
 
+Orvant ve Beyin, geliştirme sırasında görev/kanıt ve özel not yönetimi için kullanılan dış araçlardır; Ariadne uygulamasının çalışma zamanı bağımlılıkları veya bu projenin geliştirdiği bileşenler değildir. Üçüncü taraf kaynak kodu ya da belgesi, lisansı ve yeniden kullanım koşulları doğrulanmadan public repoya kopyalanmaz; kaynak bağlantısı tek başına yeniden kullanım izni sağlamaz ([GitHub lisans rehberi](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)).
+
 GitHub hesabı ve repo görünürlüğü ilk kurulumda doğrulanır. Hesap yetkisi biterse güvenli tarayıcı veya device girişini kullanıcı tamamlar; parola veya token sohbetten istenmez. Bu süreç arka planda sürekli çalışan bir izleyici değildir: her yeni commit, görev tesliminden sonra açık bir çalışma adımıdır.
