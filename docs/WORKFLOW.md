@@ -11,6 +11,7 @@ Bu proje tüm kaynak kapsamıyla, CV/GitHub önceliği ve token verimliliği gö
 | Geliştirme | Kartına göre Luna veya Sol | Tek doğrulanabilir sonuç, ilgili test ve belge |
 | Anlatım | ANLAT-001, Luna | Kısa özet ve detaylı proje açıklaması |
 | GitHub kayıtları | GIT-001, Sol; rutin işler Luna'ya devredilebilir | Repo, staging, commit, push ve uzak kayıt doğrulama |
+| Adım raporu | RAPOR-001, Luna | Doğrulanmış adımı tek mesajda kanıtları ve varsa ekran görüntüsüyle açıklama |
 
 Sohbet isimleri: `Ariadne | GÖREV-ID | Luna/Sol | Kısa iş`. Ana sohbet `Ariadne | MERKEZ | Astra | Proje sorumlusu`.
 
@@ -22,7 +23,8 @@ Sohbet isimleri: `Ariadne | GÖREV-ID | Luna/Sol | Kısa iş`. Ana sohbet `Ariad
 4. Gerekiyorsa risk odaklı bağımsız inceleme yapılır. Her görev otomatik Astra kontrolüne gitmez.
 5. Orvant'ın belirlenmiş tek yazıcısı kanıt ve durumu günceller. Açık kabul koşulu olan görev tamamlandı sayılmaz.
 6. GitHub çalışanı sabitlenmiş ilgili dosyaları açık listeyle stage eder, staged diff ve yayın kapsamını kontrol eder; doğrulanmış adımı commit/push yapar.
-7. GitHub çalışanı görev ID, commit SHA, uzak doğrulama, gerçek CI durumu ve açık konuyu ana sorumluya iletir. Ana sorumlu anlamlı gelişmeyi kaynağıyla özel çalışma günlüğüne kaydeder; bu günlüğün içeriği public repoya taşınmaz. Sonraki hazır göreve geçilir.
+7. GitHub çalışanı görev ID, commit SHA, uzak doğrulama, gerçek CI durumu ve açık konuyu ana sorumluya ve RAPOR-001 çalışanına iletir. Ana sorumlu anlamlı gelişmeyi kaynağıyla özel çalışma günlüğüne kaydeder; bu günlüğün içeriği public repoya taşınmaz.
+8. RAPOR-001 değişiklikleri, çıkan sorunları, çözümleri, yöntem gerekçesini, test/commit/CI sonucunu ve açık konuları tek mesajda anlatır; görsel değişiklikte ekran görüntüsü, diğerlerinde metin kullanır. Kanıtsız veya tamamlanmamış işi tamamlandı diye sunmaz. Sonraki hazır göreve geçilir.
 
 Her doğrulanmış anlamlı adım bir commit olur: `docs(PLAN-001): record project task plan` gibi. Her dosya yazımı veya test komutu ayrı commit değildir. Yerel commit, başarılı push ve başarılı CI ayrı durumlardır.
 
