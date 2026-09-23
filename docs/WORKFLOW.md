@@ -22,7 +22,7 @@ Sohbet isimleri: `Ariadne | GÖREV-ID | Luna/Sol | Kısa iş`. Ana sohbet `Ariad
 4. Gerekiyorsa risk odaklı bağımsız inceleme yapılır. Her görev otomatik Astra kontrolüne gitmez.
 5. Orvant'ın belirlenmiş tek yazıcısı kanıt ve durumu günceller. Açık kabul koşulu olan görev tamamlandı sayılmaz.
 6. GitHub çalışanı sabitlenmiş ilgili dosyaları açık listeyle stage eder, staged diff ve yayın kapsamını kontrol eder; doğrulanmış adımı commit/push yapar.
-7. Uzak commit SHA ve varsa CI sonucu kaydedilir. Sonraki hazır göreve geçilir.
+7. GitHub çalışanı görev ID, commit SHA, uzak doğrulama, gerçek CI durumu ve açık konuyu ana sorumluya iletir. Ana sorumlu anlamlı gelişmeyi kaynağıyla özel çalışma günlüğüne kaydeder; bu günlüğün içeriği public repoya taşınmaz. Sonraki hazır göreve geçilir.
 
 Her doğrulanmış anlamlı adım bir commit olur: `docs(PLAN-001): record project task plan` gibi. Her dosya yazımı veya test komutu ayrı commit değildir. Yerel commit, başarılı push ve başarılı CI ayrı durumlardır.
 
