@@ -1,6 +1,14 @@
 # Changes
 
-This page records product changes that are available in the public repository. Each entry links to its commit and verification record.
+This page records product changes that are available in the public repository. Entries link to their source or verification records.
+
+## T03 — Public GitHub repository reader
+
+[Reader details](backend/app/services/github_public/README.md) · [Tests](backend/tests/github_public/test_service.py)
+
+- Added a reader for canonical public GitHub repository URLs. It resolves a commit and complete tree, filters bounded source and document files, and reads selected content by pinned Git blob SHA.
+- Added path, response-size, and file-count limits; disabled API redirects; and verified returned blob size and digest. Example environment-file values are removed from document output. Repository code is treated as data and is not executed.
+- Verification: 40 targeted reader tests passed. A live public GitHub blob was also checked against its declared Git SHA. The reader currently has no user-facing API route, persistence, or private-repository access.
 
 ## T02 — PostgreSQL storage boundary
 
