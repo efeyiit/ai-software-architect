@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { LocalIcon } from './LocalIcon';
 import { request, shouldSkipPath, validateFolderBudget, type Limits } from './api';
 
 export function FolderImport({ limits, imported, repositoryId }: { limits: Limits; imported: () => void; repositoryId?: string }) {
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
-  return <div className="local-folder"><label className="local-file-label">{repositoryId ? 'Import updated folder' : 'Choose a source folder'}
+  return <div className="local-folder"><label className="local-file-label"><span className="local-folder-action"><LocalIcon name="upload"/>{busy ? 'Reading folder…' : repositoryId ? 'Import updated folder' : 'Choose a source folder'}</span>
     <input type="file" multiple {...{ webkitdirectory: '' }} disabled={busy} onChange={async event => {
       const selected = Array.from(event.target.files ?? []);
       if (!selected.length) return;
