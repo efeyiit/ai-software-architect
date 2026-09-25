@@ -128,7 +128,7 @@ def summarize_repository(
     snapshot. A provider is explicit opt-in and receives only supplied source
     texts; no network client or provider credentials live in this module.
     """
-    identity = SnapshotIdentity(repository_id=snapshot.repository_id, commit_sha=snapshot.commit_sha)
+    identity = SnapshotIdentity.from_source(snapshot)
     selected = {item.path: item for item in snapshot.included_files}
     parsable = {path for path in selected if "." + path.rsplit(".", 1)[-1].lower() in _PARSER_SUFFIXES}
     parsed = list(structures)

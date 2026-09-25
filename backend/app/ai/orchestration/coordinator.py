@@ -85,7 +85,7 @@ class OrchestrationReport(WireModel):
 
 
 def _stamp(snapshot: RepositorySnapshot) -> tuple:
-    return (snapshot.repository_id, snapshot.commit_sha, snapshot.tree_sha,
+    return (snapshot.repository_id, SnapshotIdentity.from_source(snapshot).revision, snapshot.tree_sha,
             tuple(sorted((file.path, file.blob_sha, file.included) for file in snapshot.files)))
 
 
@@ -96,7 +96,7 @@ def _blob_sha(text: str) -> str:
 
 def _validate(material: SnapshotMaterial, *, max_files: int, max_bytes: int) -> None:
     snapshot = material.snapshot
-    SnapshotIdentity(repository_id=snapshot.repository_id, commit_sha=snapshot.commit_sha)
+    SnapshotIdentity.from_source(snapshot)
     files = {file.path: file for file in snapshot.files}
     if len(files) != len(snapshot.files):
         raise ValueError("duplicate snapshot path")
@@ -216,7 +216,7 @@ class Coordinator:
     def __init__(self, current_snapshot: Callable[[str, str], RepositorySnapshot | None], *,
                  max_files: int = 2000, max_bytes: int = 20_000_000,
                  timeout_seconds: float = 30, max_concurrency: int = 3):
-        if not 1 <= max_files <= 2000 or not 1 <= max_bytes <= 20_000_000:
+        if not 1 <= max_files <= 2000 or not 1 <= max_bytes <= 20 * 1024 * 1024:
             raise ValueError("invalid input budget")
         if not 0 < timeout_seconds <= 300 or not 1 <= max_concurrency <= 5:
             raise ValueError("invalid execution budget")
@@ -304,7 +304,7 @@ class Coordinator:
                   else "succeeded" if successes == len(ROLES)
                   else "partial" if successes else "failed")
         return OrchestrationReport(
-            snapshot=SnapshotIdentity(repository_id=snapshot.repository_id, commit_sha=snapshot.commit_sha),
+            snapshot=SnapshotIdentity.from_source(snapshot),
             status=status, roles=states, items=items, conflicts=conflicts,
             dependency_graph=graph,
             architecture=results.get("architect"), testing=results.get("testing"),

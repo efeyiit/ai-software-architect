@@ -176,8 +176,7 @@ def generate_documentation(
     are never copied into generated output.
     """
     try:
-        identity = SnapshotIdentity(repository_id=snapshot.repository_id,
-                                    commit_sha=snapshot.commit_sha)
+        identity = SnapshotIdentity.from_source(snapshot)
         paths = {file.path for file in snapshot.files}
         if len(paths) != len(snapshot.files) or not set(source_texts).issubset(paths):
             raise ValueError("source paths differ from snapshot")
@@ -260,10 +259,11 @@ def generate_documentation(
                                            if route.request_fields else "Unknown."),
                             "Response: " + (", ".join(f"`{field.name}` ({field.type})" for field in route.response_fields)
                                             if route.response_fields else "Unknown."), ""])
-    api_markdown = "# API Documentation (draft)\n\nRepository commit: `" + identity.commit_sha + "`.\n\n" + (
+    revision_label = "Local snapshot" if identity.source_kind == "local" else "Repository commit"
+    api_markdown = "# API Documentation (draft)\n\n" + revision_label + ": `" + identity.revision + "`.\n\n" + (
         "\n".join(route_lines) if route_lines else "No source-backed routes found; API unknown.\n")
     readme = "\n".join([
-        "# Repository README (draft)", "", f"Repository commit: `{identity.commit_sha}`.", "",
+        "# Repository README (draft)", "", f"{revision_label}: `{identity.revision}`.", "",
         "## Project Description", "Unknown from supplied evidence.", "",
         "## Requirements", requirements, "", "## Installation", installation, "",
         "## Environment Variables", env_text + ". Values are omitted.", "",

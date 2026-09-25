@@ -88,6 +88,12 @@ class LocalStore:
             row = db.execute("SELECT * FROM analyses WHERE analysis_id=?", (analysis_id,)).fetchone()
         return dict(row) | {"report": json.loads(row["report"])} if row else None
 
+    def latest_analysis(self, repository_id: str, snapshot_id: str) -> dict | None:
+        with self._connect() as db:
+            row = db.execute("SELECT analysis_id FROM analyses WHERE repository_id=? AND snapshot_id=? "
+                             "ORDER BY rowid DESC LIMIT 1", (repository_id, snapshot_id)).fetchone()
+        return self.load_analysis(row[0]) if row else None
+
     def save_job(self, job: StoredJob) -> None:
         with self._connect() as db:
             cursor = db.execute("INSERT INTO jobs VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(job_id) "

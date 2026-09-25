@@ -110,11 +110,12 @@ class RepositorySnapshot:
     github_url: str
     name: str
     default_branch: str
-    commit_sha: str
+    commit_sha: str | None
     tree_sha: str
     files: tuple[RepositoryFile, ...]
     languages: tuple[tuple[str, int], ...]
     frameworks: tuple[str, ...]
+    snapshot_id: str | None = None
 
     @property
     def included_files(self) -> tuple[RepositoryFile, ...]:
