@@ -13,3 +13,5 @@ Short hover/focus transitions; content enters with 6px displacement and opacity 
 
 ## Interaction and truth
 Every visible control works. Theme preference is retained. Empty, loading, error, unavailable and analysis states are explicit. UI does not invent settings, user accounts, activity timestamps or disk paths. Source links retain snapshot identity.
+
+The home surface uses a bundled petrol landscape with a fine mint thread. Keep it behind the hero and fade it before the repository list. Import controls sit directly on the page: a wide URL line and a smaller folder action, without a shared filled card. Cursor states distinguish interactive, text, unavailable and busy controls. Fonts live under /brand/fonts so the local runtime serves them.

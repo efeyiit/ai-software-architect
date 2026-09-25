@@ -6,7 +6,7 @@ export function FolderImport({ limits, imported, repositoryId }: { limits: Limit
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
   return <div className="local-folder"><label className="local-file-label"><span className="local-folder-action"><LocalIcon name="upload"/>{busy ? 'Reading folder…' : repositoryId ? 'Import updated folder' : 'Choose a source folder'}</span>
-    <input type="file" multiple {...{ webkitdirectory: '' }} disabled={busy} onChange={async event => {
+    <input type="file" multiple {...{ webkitdirectory: '' }} disabled={busy} aria-busy={busy} onChange={async event => {
       const selected = Array.from(event.target.files ?? []);
       if (!selected.length) return;
       setBusy(true);
@@ -21,9 +21,9 @@ export function FolderImport({ limits, imported, repositoryId }: { limits: Limit
         }
         setStatus('Saving source snapshot…');
         const result = await request('import', { name: selected[0].webkitRelativePath.split('/')[0] || 'Local folder', files, repository_id: repositoryId ?? null });
-        setStatus(`Imported. ${selected.length - allowed.length} sensitive/generated files skipped before upload; ${Object.keys(result.excluded).length} additional exclusions.`);
+        setStatus(`Imported. ${selected.length - allowed.length} files skipped; ${Object.keys(result.excluded).length} additional exclusions.`);
         imported();
       } catch (error) { setStatus(error instanceof Error ? error.message : 'Folder import failed.'); }
       finally { setBusy(false); event.target.value = ''; }
-    }}/></label><p className="local-muted">Files stay on this computer. Environment files, keys and dependency folders are skipped. Source code is never executed.</p><p role="status">{status}</p></div>;
+    }}/></label><p className="local-muted">Your files stay on this computer. Keys, environment files and dependency folders are skipped.</p><p role="status">{status}</p></div>;
 }
