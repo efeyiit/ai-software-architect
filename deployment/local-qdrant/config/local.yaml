@@ -1,0 +1,8 @@
+storage:
+  storage_path: ./data/storage
+  snapshots_path: ./data/snapshots
+service:
+  host: 127.0.0.1
+  http_port: 6333
+  grpc_port: null
+telemetry_disabled: true

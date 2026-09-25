@@ -1,0 +1,7 @@
+runtime/
+data/
+logs/
+state/
+storage/
+snapshots/
+.qdrant-initialized

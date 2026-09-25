@@ -2,6 +2,14 @@
 
 This page records product changes that are available in the public repository. Entries link to their source or verification records.
 
+## T22 — Local Qdrant setup guards
+
+[Setup and current limits](deployment/local-qdrant/README.md)
+
+- Added Windows scripts to install a pinned Qdrant release, verify both the archive and executable digests, and configure a loopback-only service with an API key kept outside Git.
+- Added an access-control preflight that refuses startup when the code path is writable by untrusted accounts or private data and the key are too broadly accessible. On the current computer it correctly blocks startup because the repository inherits broad permissions.
+- Verification: eight PowerShell scripts parsed without errors, the executable digest checks passed, and the access-control preflight rejected the current broad permissions. A fresh installation and a protected-permission start, authentication, and persistence test have **not** been completed for this version. Earlier smoke results do not verify it as a running service.
+
 ## T03 — Public GitHub repository reader
 
 [Reader details](backend/app/services/github_public/README.md) · [Tests](backend/tests/github_public/test_service.py)

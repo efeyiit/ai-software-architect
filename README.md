@@ -23,7 +23,7 @@ pnpm test
 pnpm build
 ```
 
-The API currently exposes `/health`; the frontend displays a minimal application shell. An owner-scoped PostgreSQL store and a public GitHub repository reader are available as building blocks. See the [change log](CHANGELOG.md) for what each delivered step added, how it was checked, and what remains open.
+The API currently exposes `/health`; the frontend displays a minimal application shell. An owner-scoped PostgreSQL store and a public GitHub repository reader are available as building blocks. Local Qdrant setup scripts are included, but their access-control checks block startup on the current computer. See the [change log](CHANGELOG.md) for what each delivered step added, how it was checked, and what remains open.
 
 ## Product direction
 
