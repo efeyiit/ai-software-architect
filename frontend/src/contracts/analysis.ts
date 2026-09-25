@@ -7,6 +7,21 @@ export const repositorySnapshotSchema = strict({
   commit_sha: z.string().regex(/^[0-9a-f]{40}$/),
 });
 
+export const localSnapshotSchema = strict({
+  repository_id: z.string().min(1),
+  source_kind: z.literal('local'),
+  commit_sha: z.null(),
+  snapshot_id: z.string().regex(/^local:[0-9a-f]{64}$/),
+});
+
+export const sourceSnapshotSchema = z.union([repositorySnapshotSchema, localSnapshotSchema]);
+
+export function snapshotRevision(snapshot: { repository_id: string; commit_sha: string | null; snapshot_id?: string }): string {
+  if (snapshot.commit_sha !== null) return snapshot.commit_sha;
+  if (snapshot.snapshot_id) return snapshot.snapshot_id;
+  throw new Error('Snapshot has no source identity');
+}
+
 export const sourceLocationSchema = strict({
   path: z.string().min(1).refine((path) =>
     !path.startsWith('/') &&

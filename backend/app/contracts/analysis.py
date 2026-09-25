@@ -36,7 +36,36 @@ class Severity(StrEnum):
 
 class RepositorySnapshot(WireModel):
     repository_id: str = Field(min_length=1, strict=True)
-    commit_sha: str = Field(pattern=r"^[0-9a-f]{40}$", strict=True)
+    commit_sha: str | None = Field(default=None, pattern=r"^[0-9a-f]{40}$", strict=True)
+    source_kind: Literal["local"] | None = None
+    snapshot_id: str | None = Field(default=None, pattern=r"^local:[0-9a-f]{64}$", strict=True)
+
+    @model_validator(mode="after")
+    def unambiguous_origin(self) -> "RepositorySnapshot":
+        if self.source_kind == "local":
+            if self.commit_sha is not None or self.snapshot_id is None:
+                raise ValueError("local snapshots require a content identity and no Git commit")
+        elif self.commit_sha is None or self.snapshot_id is not None:
+            raise ValueError("GitHub snapshots require a Git commit and no local identity")
+        return self
+
+    @property
+    def revision(self) -> str:
+        return self.snapshot_id if self.source_kind == "local" else self.commit_sha
+
+    @model_serializer(mode="wrap")
+    def preserve_github_wire(self, handler):
+        result = handler(self)
+        if self.source_kind is None:
+            result.pop("source_kind", None)
+            result.pop("snapshot_id", None)
+        return result
+
+    @classmethod
+    def from_source(cls, snapshot) -> "RepositorySnapshot":
+        local_id = getattr(snapshot, "snapshot_id", None)
+        return cls(repository_id=snapshot.repository_id, commit_sha=snapshot.commit_sha,
+                   source_kind="local" if local_id else None, snapshot_id=local_id)
 
 
 class SourceLocation(WireModel):
