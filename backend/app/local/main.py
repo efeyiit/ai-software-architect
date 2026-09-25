@@ -33,6 +33,10 @@ class SnapshotInput(WireModel):
     snapshot_id: str = Field(min_length=1, max_length=100)
 
 
+class ChatInput(SnapshotInput):
+    question: str = Field(min_length=1, max_length=1000)
+
+
 def create_local_app(data_dir: Path, *, max_body_bytes: int = 30 * 1024 * 1024) -> FastAPI:
     data_dir = Path(data_dir)
     store = LocalStore(data_dir / "ariadne.sqlite3")
@@ -57,10 +61,21 @@ def create_local_app(data_dir: Path, *, max_body_bytes: int = 30 * 1024 * 1024) 
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             store.recover_interrupted_jobs()
             app.state.runtime = LocalRuntime(store)
+            app.state.retrieval = None
+            if os.environ.get("ARIADNE_LOCAL_RUNTIME_TOKEN"):
+                from app.local.retrieval import LocalRetrieval
+                from app.local_inference.provider import LocalAnswerProvider, LocalEmbeddingProvider
+                try:
+                    app.state.retrieval = LocalRetrieval(data_dir / "vectors", store, LocalEmbeddingProvider(), LocalAnswerProvider())
+                except Exception:
+                    # Optional indexing must never prevent static analysis from opening.
+                    app.state.retrieval = None
             try:
                 yield
             finally:
                 app.state.runtime.close()
+                if app.state.retrieval is not None:
+                    app.state.retrieval.close()
         finally:
             lock.close()
 
@@ -92,6 +107,24 @@ def create_local_app(data_dir: Path, *, max_body_bytes: int = 30 * 1024 * 1024) 
     @app.get("/api/local/repositories")
     def repositories():
         return store.list_repositories()
+
+    @app.get("/api/local/ai")
+    def ai_status():
+        if app.state.retrieval is None:
+            return {"status": "unavailable"}
+        from app.local_inference.provider import runtime_health
+        try:
+            runtime_health()
+            return {"status": "ready"}
+        except Exception:
+            return {"status": "unavailable"}
+
+    @app.post("/api/local/chat")
+    def chat(body: ChatInput):
+        get_source(body.repository_id, body.snapshot_id)
+        if app.state.retrieval is None:
+            return {"status": "unavailable", "answer": "Local AI is not connected. Static analysis remains usable.", "claims": [], "snapshot_id": body.snapshot_id}
+        return app.state.retrieval.ask(body.repository_id, body.snapshot_id, body.question)
 
     @app.post("/api/local/import")
     def folder(body: FolderInput):
@@ -143,6 +176,13 @@ def create_local_app(data_dir: Path, *, max_body_bytes: int = 30 * 1024 * 1024) 
     def report(repository_id: str, snapshot_id: str):
         get_source(repository_id, snapshot_id)
         return store.latest_analysis(repository_id, snapshot_id)
+
+    @app.get("/api/local/export")
+    def export(repository_id: str, snapshot_id: str):
+        result = report(repository_id, snapshot_id)
+        if result is None:
+            raise HTTPException(404, "REPORT_NOT_FOUND")
+        return JSONResponse(result["report"], headers={"Content-Disposition": 'attachment; filename="ariadne-analysis.json"', "Cache-Control": "no-store"})
 
     frontend = Path(__file__).resolve().parents[3] / "frontend" / "dist"
     if frontend.is_dir():

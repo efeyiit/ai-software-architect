@@ -63,9 +63,11 @@ class LocalRuntime:
                 raise ValueError("runtime is closed")
             key = repository_id, snapshot_id
             if key in self._jobs:
-                return self.store.load_job(self._jobs[key])
-            if sum(not stop.is_set() and self.store.load_job(job_id).status in ("queued", "running")
-                   for job_id, stop in self._stop.items()) >= 8:
+                existing = self.store.load_job(self._jobs[key])
+                if existing.status not in ("failed", "cancelled"):
+                    return existing
+            if sum(self.store.load_job(job_id).status in ("queued", "running")
+                   for job_id in self._stop) >= 8:
                 raise ValueError("analysis queue is full")
             source = self.store.load_snapshot(repository_id, snapshot_id)
             if source is None:

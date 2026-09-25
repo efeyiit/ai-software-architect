@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from hashlib import sha256
 import json
+import re
 from pathlib import PurePosixPath
 import unicodedata
 from uuid import uuid4
@@ -41,7 +42,7 @@ def exclusion_reason(path: str, content: str) -> str | None:
         return "generated_or_dependency_directory"
     if name == ".env" or name.startswith(".env.") or name in SKIP_NAMES or suffix in PRIVATE_SUFFIXES:
         return "sensitive_file"
-    if "PRIVATE KEY-----" in content:
+    if re.search(r"(?m)^\s*-----BEGIN (?:[A-Z0-9]+ )?PRIVATE KEY-----\s*$", content):
         return "private_key_content"
     if "\x00" in content:
         return "binary_content"

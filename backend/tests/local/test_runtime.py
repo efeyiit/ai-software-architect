@@ -63,3 +63,32 @@ def test_public_reader_preserves_real_commit_without_credentials(tmp_path):
             "repository_id": source.repository_id, "commit_sha": "a" * 40}
     finally:
         runtime.close()
+
+def test_cancelled_queue_slots_remain_bounded_and_terminal_jobs_can_retry(tmp_path):
+    import pytest
+    class HeldPool:
+        def submit(self, *args):
+            pass
+        def shutdown(self, **kwargs):
+            pass
+    store = LocalStore(tmp_path / 'data.sqlite3')
+    runtime = LocalRuntime(store)
+    runtime._pool.shutdown()
+    runtime._pool = HeldPool()
+    jobs = []
+    for i in range(9):
+        source = import_files(str(i), [UploadedSource(path='main.py', content=f'x = {i}')])
+        store.save_snapshot(source)
+        if i == 8:
+            with pytest.raises(ValueError, match='queue is full'):
+                runtime.analyze(source.repository_id, source.snapshot_id)
+        else:
+            job = runtime.analyze(source.repository_id, source.snapshot_id)
+            jobs.append(job)
+            runtime.cancel(job.job_id)
+    job = jobs[0]
+    job.status = 'cancelled'
+    store.save_job(job)
+    retried = runtime.analyze(job.repository_id, job.snapshot_id)
+    assert retried.job_id != job.job_id
+    runtime.close()

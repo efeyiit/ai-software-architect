@@ -124,14 +124,15 @@ const dependenciesSchema = strict({
     reason: z.string().nullable() })), cycles: z.array(z.array(z.string())), critical_nodes: z.array(z.string()),
 });
 
-const analysisResultV2Schema = strict({
-  schema_version: z.literal(2), analysis_id: z.string().min(1), snapshot: repositorySnapshotSchema,
+function makeAnalysisV2Schema<T extends typeof repositorySnapshotSchema | typeof sourceSnapshotSchema>(snapshot: T) {
+return strict({
+  schema_version: z.literal(2), analysis_id: z.string().min(1), snapshot,
   status: z.enum(['pending', 'running', 'succeeded', 'failed', 'partial', 'cancelled']),
   findings: z.array(analysisFindingSchema), errors: z.array(analysisErrorSchema),
   partial: z.boolean(), ai_status: z.literal('unavailable'), roles: z.array(roleSchema),
   items: z.array(itemSchema), conflicts: z.array(conflictSchema),
   architecture: architectureSchema.nullable(), testing: testingSchema.nullable(),
-  refactoring: refactoringSchema.nullable(), documentation: documentationSchema.nullable(),
+  refactoring: refactoringSchema.nullable(), documentation: documentationSchema.extend({ snapshot }).nullable(),
   dependencies: dependenciesSchema.nullable(),
 }).superRefine((result, context) => {
   const error = (message: string) => context.addIssue({ code: 'custom', message });
@@ -149,8 +150,14 @@ const analysisResultV2Schema = strict({
   if (ids.size !== result.items.length || result.conflicts.some((conflict) => conflict.item_ids.some((id) => !ids.has(id))))
     error('report items and conflicts must be internally linked');
 });
+}
+
+const analysisResultV2Schema = makeAnalysisV2Schema(repositorySnapshotSchema);
 
 export const analysisResultSchema = z.union([analysisResultV1Schema, analysisResultV2Schema]);
+
+export const localAnalysisResultSchema = makeAnalysisV2Schema(sourceSnapshotSchema);
+export type LocalAnalysisResult = z.infer<typeof localAnalysisResultSchema>;
 
 export type AnalysisResult = z.infer<typeof analysisResultSchema>;
 

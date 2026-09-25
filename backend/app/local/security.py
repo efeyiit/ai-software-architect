@@ -1,6 +1,6 @@
 """Local-only host/origin checks and bounded request buffering."""
 
-from http.cookies import SimpleCookie
+from http.cookies import CookieError, SimpleCookie
 from secrets import compare_digest
 import re
 
@@ -26,7 +26,7 @@ class LocalBoundary:
                 cookies.load(headers.get("cookie", ""))
                 cookie = cookies.get("ariadne_local")
                 valid = cookie and compare_digest(cookie.value, self.session)
-            except (ValueError, TypeError):
+            except (CookieError, ValueError, TypeError):
                 valid = False
             if not valid:
                 return await JSONResponse({"detail": "LOCAL_SESSION_REQUIRED"}, status_code=401)(scope, receive, send)

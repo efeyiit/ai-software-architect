@@ -50,3 +50,11 @@ def test_repository_id_can_be_preserved_on_reimport():
     second = import_files("Renamed", [UploadedSource(path="a.py", content="two")], repository_id=first.repository_id)
     assert second.repository_id == first.repository_id
     assert second.snapshot_id != first.snapshot_id
+
+
+def test_key_detection_does_not_exclude_a_detector_source_file():
+    sources = [UploadedSource(path="detector.py", content='if "PRIVATE KEY-----" in content: pass'),
+               UploadedSource(path="unsafe.txt", content='-----BEGIN RSA PRIVATE KEY-----\nsecret\n-----END RSA PRIVATE KEY-----')]
+    result = import_files("Detector", sources)
+    assert "detector.py" in result.sources
+    assert result.excluded["unsafe.txt"] == "private_key_content"

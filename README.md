@@ -1,32 +1,55 @@
 # Ariadne
 
-Ariadne is a developer tool for exploring a GitHub repository through its architecture, dependencies, code quality, tests, security findings, and source-linked explanations. Its name comes from Ariadne's thread through the labyrinth: each finding should lead back to the code and evidence that explains it.
+Ariadne explores a codebase through its architecture, dependencies, code quality, tests, security findings, and source-linked explanations. Its name comes from Ariadne's thread through the labyrinth: every finding should lead back to the code behind it.
 
-**Status: development, not ready for end-to-end use.** Repository readers, five language parsers, analysis modules, source-cited retrieval, PostgreSQL persistence, a job queue, authenticated API routes, and React screens are implemented. Real GitHub login through persisted analysis and source-cited chat has not passed end-to-end acceptance. See the [current verification record](docs/evidence/2026-09-25-baseline.md) for tested behavior and remaining setup requirements.
+## Run locally
 
-## Run the current foundation
+The local workspace requires no account, GitHub OAuth app, PostgreSQL server, or cloud AI key. Import a public GitHub URL or select a local source folder, including a locally cloned private repository.
 
-From `backend/`:
+Install Python dependencies from `backend/`:
 
 ```sh
 uv sync
-uv run uvicorn app.main:app --reload
-uv run pytest -q
 ```
 
-From `frontend/`:
+Install and build the interface from `frontend/`:
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm dev
-pnpm test
 pnpm build
 ```
 
-The API exposes `/health` for process liveness. Authentication and repository routes return 503 until their database and OAuth configuration are available; `/health` alone does not establish product readiness. The frontend includes repository, file, architecture, dependency, and finding screens with explicit unavailable states. The [local application launcher](deployment/local-app/README.md) documents the HTTPS, PostgreSQL, OAuth, Qdrant, and model prerequisites. Current local setup is blocked by missing configuration and filesystem permission checks.
+Start from `backend/`:
 
-## Product direction
+```sh
+uv run python -m app.local.launcher
+```
 
-The [product roadmap](docs/product-roadmap.md) summarizes the planned capabilities. The [source design](docs/source-design.md) gives the full intended scope, and [architecture decisions](docs/architecture-decisions.md) describe the implemented foundation.
+Open **http://127.0.0.1:8080**. Stop with Ctrl+C. The service listens on loopback only; this is a single-user local workspace, not a hosted public service.
 
-The design calls for source evidence to remain distinct from AI interpretation and for analyzed repository code not to run by default. These are product requirements; future capabilities need their own implementation and verification.
+## Explore a repository
+
+- **Public GitHub:** paste a repository URL. Sources are fetched at a real commit; GitHub's unauthenticated API limits apply.
+- **Local/private:** choose the project folder. Selected text files are copied into local storage; the original files are never executed or changed. Common secret files and generated directories are excluded. Review your selection: filtering cannot identify every secret.
+- Run analysis for architecture, dependencies, security observations, testing observations, refactoring candidates, and documentation drafts. Follow findings to the saved source lines or export the complete report.
+- Reports and source snapshots survive restarts. Reimporting changed files creates a new content identity; old source links stay pinned to their original snapshot.
+
+Local imports allow up to 2,000 selected files, 1 MiB per file, and 20 MiB total text. Parsing covers Python, TypeScript/TSX, Java, C#, and C++; other supported text can provide documentation context. Analysis is static: test detection is not test execution, and absence of findings does not establish correctness or security.
+
+Data is stored under `storage/local/` (SQLite and optional embedded Qdrant). Set `ARIADNE_LOCAL_DATA` to choose another data directory. The storage directory is excluded from Git.
+
+## Optional local AI
+
+Static analysis works without a model. If the model environment and cached weights described in [local model setup](training/LOCAL-RUNTIME.md) are already installed, start with:
+
+```sh
+uv run python -m app.local.launcher --with-ai
+```
+
+The launcher does not download models. AI chat retrieves excerpts from the selected repository and snapshot, then checks cited lines and quotes against the saved sources. The interface explicitly reports unavailable, unsupported, or rejected answers. Citation validation checks source correspondence; it does not guarantee that a model's interpretation is correct.
+
+## Verification and alternate server mode
+
+See the [local acceptance record](docs/evidence/2026-09-25-local-workspace.md) for actual checks and limitations. Run `uv run pytest -q` in `backend/`, and `pnpm test` / `pnpm build` in `frontend/`.
+
+The separate [authenticated server setup](deployment/local-app/README.md) retains PostgreSQL, HTTPS, and GitHub OAuth integration. Those prerequisites are not needed for the local workspace. The [roadmap](docs/product-roadmap.md) and [source design](docs/source-design.md) describe broader capabilities; they are not claims that every planned feature has been delivered.

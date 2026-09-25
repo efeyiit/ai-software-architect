@@ -7,6 +7,7 @@ source code. The launcher supplies one ephemeral token via child environment.
 import hmac
 import hashlib
 import json
+import re
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -172,7 +173,8 @@ class Runtime:
                     or item["id"] in seen_evidence_ids
                     or not isinstance(item["path"], str) or not item["path"]
                     or not isinstance(item["commit_sha"], str)
-                    or len(item["commit_sha"]) != 40
+                    # Legacy wire key also carries explicit local content identities.
+                    or not re.fullmatch(r"(?:[0-9a-f]{40}|local:[0-9a-f]{64})", item["commit_sha"])
                     or type(item["start_line"]) is not int
                     or type(item["end_line"]) is not int
                     or item["end_line"] < item["start_line"]

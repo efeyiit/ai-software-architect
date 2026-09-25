@@ -1,4 +1,6 @@
-# Local product runtime
+# Alternate authenticated server runtime
+
+For the account-free local workspace, follow the [main README](../../README.md). This document covers the separate OAuth/PostgreSQL server configuration.
 
 `open.ps1` starts the real Ariadne application at `https://localhost:8443/`.
 The same origin serves the built frontend, GitHub OAuth routes, and authenticated

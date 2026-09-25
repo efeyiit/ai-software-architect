@@ -15,6 +15,15 @@ VALID = '{"claims":[{"text":"answer returns 42","passage_id":"P01"}]}'
 
 
 class PassageSelectionTests(unittest.TestCase):
+    def test_local_content_identity_is_accepted_without_fake_commit(self):
+        runtime = Runtime.__new__(Runtime)
+        runtime._generate = lambda messages: VALID
+        request = dict(REQUEST, evidence=[dict(EVIDENCE[0], commit_sha="local:" + "b" * 64)])
+        self.assertTrue(runtime.answer(request)["claims"])
+        for invalid in ("x" * 40, "local:" + "b" * 40, "local:" + "z" * 64):
+            with self.subTest(identity=invalid), self.assertRaises(Rejected):
+                runtime.answer(dict(REQUEST, evidence=[dict(EVIDENCE[0], commit_sha=invalid)]))
+
     def test_server_derives_exact_quote_and_coordinates(self):
         passages = Runtime._passages(EVIDENCE)
         output = Runtime._check_selection(VALID, passages)
