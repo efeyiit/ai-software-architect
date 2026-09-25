@@ -2,7 +2,7 @@
 
 Ariadne is a developer tool for exploring a GitHub repository through its architecture, dependencies, code quality, tests, security findings, and source-linked explanations. Its name comes from Ariadne's thread through the labyrinth: each finding should lead back to the code and evidence that explains it.
 
-**Status: early implementation.** The FastAPI and React shells, a shared analysis-result contract, and targeted contract tests are in place. Repository ingestion, automated analysis, AI features, and a complete product demo are still planned.
+**Status: development, not ready for end-to-end use.** Repository readers, five language parsers, analysis modules, source-cited retrieval, PostgreSQL persistence, a job queue, authenticated API routes, and React screens are implemented. Real GitHub login through persisted analysis and source-cited chat has not passed end-to-end acceptance. See the [current verification record](docs/evidence/2026-09-25-baseline.md) for tested behavior and remaining setup requirements.
 
 ## Run the current foundation
 
@@ -23,7 +23,7 @@ pnpm test
 pnpm build
 ```
 
-The API currently exposes `/health`; the frontend displays a minimal application shell. An owner-scoped PostgreSQL store and a public GitHub repository reader are available as building blocks. Local Qdrant setup scripts are included, but their access-control checks block startup on the current computer. See the [change log](CHANGELOG.md) for what each delivered step added, how it was checked, and what remains open.
+The API exposes `/health` for process liveness. Authentication and repository routes return 503 until their database and OAuth configuration are available; `/health` alone does not establish product readiness. The frontend includes repository, file, architecture, dependency, and finding screens with explicit unavailable states. The [local application launcher](deployment/local-app/README.md) documents the HTTPS, PostgreSQL, OAuth, Qdrant, and model prerequisites. Current local setup is blocked by missing configuration and filesystem permission checks.
 
 ## Product direction
 

@@ -45,4 +45,21 @@ describe('analysis wire contract', () => {
     data.findings[0].description = payload;
     expect(parseAnalysisResult(data).findings[0].description).toBe(payload);
   });
+
+  it('round trips a typed partial v2 report and rejects status mismatch', () => {
+    const data = clone();
+    Object.assign(data, { schema_version: 2, status: 'partial', partial: true, ai_status: 'unavailable',
+      roles: ['architect', 'security', 'testing', 'refactoring', 'documentation'].map((role) => ({
+        role, status: role === 'documentation' ? 'timed_out' : 'succeeded',
+        error_code: role === 'documentation' ? 'ROLE_TIMEOUT' : null,
+      })), items: [], conflicts: [], architecture: { hypotheses: [], summary: 'unknown', primary: null },
+      testing: { test_files: [], services: [], coverage: null, coverage_status: 'missing', coverage_errors: [] },
+      refactoring: { evidence: [], recommendations: [], architecture_context: [], ai_status: 'unavailable', limitations: [] },
+      documentation: null, dependencies: { nodes: [], edges: [], cycles: [], critical_nodes: [] },
+      errors: [{ code: 'ROLE_TIMEOUT', message: 'Documentation role timed out', retryable: true, location: null }],
+    });
+    expect(parseAnalysisResult(data)).toEqual(data);
+    data.partial = false;
+    expect(() => parseAnalysisResult(data)).toThrow();
+  });
 });

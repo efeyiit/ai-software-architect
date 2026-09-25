@@ -1,0 +1,8 @@
+# Local training environment, downloads, and generated evidence
+.venv/
+.cache/
+checkpoints/
+reports/
+*.log
+__pycache__/
+*.py[cod]

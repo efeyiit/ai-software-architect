@@ -1,4 +1,4 @@
-# Analysis wire contract v1
+# Analysis wire contract v1 and v2
 
 `AnalysisResult` is the JSON boundary between FastAPI and React. The backend
 validates it with Pydantic; the frontend validates untrusted API JSON with Zod.
@@ -26,3 +26,18 @@ retrieval and analysis endpoints; T01 only boots `/health`.
 The versioned schema is intentionally small. Changes to field names, enum
 values, nullability, or validation need synchronized Python and TypeScript
 updates plus the shared fixture tests.
+
+V2 retains the same identity, findings and errors while adding `partial`,
+`ai_status`, five role states, source-linked merge items/conflicts, and typed
+architecture, testing, refactoring, documentation and dependency reports.
+`status=partial` requires `partial=true`, at least one successful and one failed
+or timed-out role, and structured errors. A succeeded v2 report requires all
+five roles to succeed and no errors. `ai_status=unavailable` is explicit: the
+deterministic role results are not represented as model output. Optional typed
+sections are `null` when their role did not return a result. Dependency edges
+preserve `resolved`, `external` and `ambiguous` status from T10.
+
+Stored v1 JSON is accepted and serialized back without injected v2 fields.
+Unknown fields and invalid status/partial combinations remain rejected on
+both sides. The queue stores partial/failed/cancelled terminal records, while
+the completed-result cache accepts only succeeded records.

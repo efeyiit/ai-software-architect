@@ -41,3 +41,10 @@ docs/COVERAGE.md
 docs/TASKS.md
 docs/tasks/
 docs/ORVANT-RENAME-FOLLOWUP.md
+
+# Local handoff, browser captures, and vector database runtime data
+PROJECT-HANDOFF.md
+.playwright-cli/
+.qdrant-initialized
+storage/
+snapshots/
