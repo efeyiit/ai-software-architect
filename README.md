@@ -23,7 +23,7 @@ pnpm test
 pnpm build
 ```
 
-The API currently exposes `/health`; the frontend displays a minimal application shell. See the [T01 verification record](docs/evidence/T01.md) for the tested behavior and its limits.
+The API currently exposes `/health`; the frontend displays a minimal application shell. An owner-scoped PostgreSQL store is also available as a building block. See the [change log](CHANGELOG.md) for what each delivered step added, how it was checked, and what remains open.
 
 ## Product direction
 
