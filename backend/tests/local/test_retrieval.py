@@ -65,3 +65,23 @@ def test_citations_must_match_exact_source(tmp_path, quote, expected):
         assert index.ask(source.repository_id, source.snapshot_id, "What does greet return?")["status"] == expected
     finally:
         index.close()
+
+def test_answer_receives_best_ranked_source_without_distracting_neighbors(tmp_path):
+    class RankedVectors(Vectors):
+        def embed_documents(self, texts):
+            return [[1., 0.] if 'def add_one' in text else [0., 1.] for text in texts]
+    class Answers:
+        execution_location = 'local'
+        def answer(self, prompt):
+            assert len(prompt.evidence) == 1
+            assert prompt.evidence[0].path == 'simple.py'
+            return {'claims': []}
+    store = LocalStore(tmp_path / 'data.sqlite3')
+    source = import_files('one', [UploadedSource(path='simple.py', content='def add_one(n):\n    return n + 1'), UploadedSource(path='README.md',content='Unrelated installation instructions')])
+    store.save_snapshot(source)
+    index = LocalRetrieval(tmp_path / 'vectors', store, RankedVectors(), Answers())
+    try:
+        result = index.ask(source.repository_id, source.snapshot_id, 'What does add_one return?')
+        assert result['status'] == 'no_evidence'
+    finally:
+        index.close()

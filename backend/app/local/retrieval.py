@@ -84,7 +84,9 @@ class LocalRetrieval:
             hits = self.search(repository_id, snapshot_id, question)
             evidence = []
             budget = 12000
-            for hit in hits:
+            # The small local model answers reliably from focused evidence;
+            # unrelated neighbors caused abstentions even with the right top hit.
+            for hit in hits[:1]:
                 text = hit["text"][:budget]
                 if not text:
                     break

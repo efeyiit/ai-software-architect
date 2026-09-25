@@ -46,7 +46,7 @@ Static analysis works without a model. If the model environment and cached weigh
 uv run python -m app.local.launcher --with-ai
 ```
 
-The launcher does not download models. AI chat retrieves excerpts from the selected repository and snapshot, then checks cited lines and quotes against the saved sources. The interface explicitly reports unavailable, unsupported, or rejected answers. Citation validation checks source correspondence; it does not guarantee that a model's interpretation is correct.
+The launcher does not download models. AI chat answers from the highest-ranked source excerpt in the selected repository and snapshot, then checks cited lines and quotes against the saved sources. Ask focused questions about a function or file; broad questions may need more context. See the [live AI acceptance results](docs/evidence/2026-09-25-focused-local-ai.md) for verified examples and remaining limitations. The interface explicitly reports unavailable, unsupported, or rejected answers. Citation validation checks source correspondence; it does not guarantee that a model's interpretation is correct.
 
 ## Verification and alternate server mode
 
