@@ -23,8 +23,9 @@ export function Atmosphere() {
     <svg viewBox="0 0 1536 1024" preserveAspectRatio="xMaxYMin slice" className="local-landscape-art">
       <defs>
         <filter id="thread-glow"><feGaussianBlur stdDeviation="4"/></filter>
-        <filter id="valley-feather"><feGaussianBlur stdDeviation="45"/></filter>
-        <mask id="valley-mist"><path d={thread} fill="none" stroke="white" strokeWidth="340" filter="url(#valley-feather)"/></mask>
+        {/* Include the wide stroke and blur halo; the default path bounds clip them into a rectangle. */}
+        <filter id="valley-feather" filterUnits="userSpaceOnUse" x="-300" y="-300" width="2136" height="1624"><feGaussianBlur stdDeviation="45"/></filter>
+        <mask id="valley-mist" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2136" height="1624"><path d={thread} fill="none" stroke="white" strokeWidth="340" filter="url(#valley-feather)"/></mask>
       </defs>
       <image href="/brand/ariadne-valley.png" width="1536" height="1024"/>
       <path className="local-filament" d={thread}/>
