@@ -200,17 +200,13 @@
   .local-home .local-topbar,.local-home .local-footer{padding-left:48px;padding-right:max(48px,calc(100% - 1152px))}
   .local-home .local-hero h1{font-size:54px}
 }
+/* Scale the whole home composition together instead of spreading its sections apart. */
 @media(min-width:1800px){
-  .local-home main:has(.local-library){display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-rows:auto auto;align-content:start;align-items:start;column-gap:64px;row-gap:24px;max-width:none}
-  .local-home .local-hero{grid-column:1;grid-row:1;margin-bottom:0}
-  .local-home .local-import-grid{grid-column:1;grid-row:2;margin-bottom:0}
-  .local-home .local-library{grid-column:2;grid-row:1 / span 2;min-width:0;padding-top:24px}
+  .local-shell:has(.local-home){--workspace-scale:1.25;zoom:var(--workspace-scale);min-height:calc(100dvh / var(--workspace-scale))}
+  .local-shell:has(.local-home) .local-sidebar{height:calc(100dvh / var(--workspace-scale))}
+  .local-home main{max-width:none}
   .local-home .local-topbar,.local-home .local-footer{padding-inline:48px}
-  .local-home .local-source-switch{align-items:flex-start;flex-direction:column;gap:8px}
-  .local-home .local-margin-note{display:none}
-  .local-home main>.local-error{grid-column:1 / -1;grid-row:1}
-  .local-home main:has(>.local-error) .local-hero{grid-row:2}
-  .local-home main:has(>.local-error) .local-import-grid{grid-row:3}
-  .local-home main:has(>.local-error) .local-library{grid-row:2 / span 2}
 }
+@media(min-width:2200px){.local-shell:has(.local-home){--workspace-scale:1.5}}
+@media(min-width:2500px){.local-shell:has(.local-home){--workspace-scale:1.6}}
 @media(max-width:600px){.local-landscape{height:510px;opacity:.38}[data-theme="dark"] .local-landscape{opacity:.6}.local-source-switch>div{width:100%;gap:20px}.local-source-switch button{font-size:11px}.local-import-section .local-folder{align-items:flex-start;flex-direction:column;gap:12px}.local-shell .theme-toggle--compact{min-height:44px;height:44px;width:74px}.theme-toggle--compact::before{top:8px}.theme-toggle__choice{height:36px}.local-url-entry{display:grid;grid-template-columns:20px minmax(0,1fr)}.local-shell .local-url-entry input{width:100%;min-width:0}.local-url-entry .local-primary{grid-column:1/-1;width:100%;margin:0}.local-import-grid{min-height:285px}}
