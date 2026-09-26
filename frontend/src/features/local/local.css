@@ -158,6 +158,7 @@
 .local-fog-far{opacity:.18;animation-duration:37s;animation-delay:-18s;animation-direction:reverse}
 .local-signal{fill:none;stroke:#e1fff4;stroke-width:2;stroke-linecap:round;stroke-dasharray:3 97;stroke-dashoffset:5;animation:local-thread-flow 14s linear infinite;opacity:0}
 .local-signal-glow{stroke:#83fbd1;stroke-width:9}
+.local-filament{fill:none;stroke:#9edfcf;stroke-width:1.2;opacity:.45}
 @keyframes local-thread-flow{0%{stroke-dashoffset:5;opacity:0}8%{opacity:.85}85%{opacity:.85}100%{stroke-dashoffset:-100;opacity:0}}
 @keyframes local-fog-drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(17px,-9px) scale(1.025)}}
 .local-landscape[data-paused=true] *{animation-play-state:paused!important}

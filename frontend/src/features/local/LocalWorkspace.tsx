@@ -65,15 +65,6 @@ export function LocalWorkspace() {
   const [url, setUrl] = useState('');
   const [filter, setFilter] = useState('');
   const [sourceKind, setSourceKind] = useState<'github' | 'local'>('github');
-  const [reducedMotion, setReducedMotion] = useState(() => {
-    try { const saved = localStorage.getItem('ariadne:reduced-motion'); if (saved !== null) return saved === 'true'; } catch { /* A session preference still works. */ }
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
-  function toggleMotion() {
-    const next = !reducedMotion;
-    setReducedMotion(next);
-    try { localStorage.setItem('ariadne:reduced-motion', String(next)); } catch { /* Keep the session preference. */ }
-  }
   const [busy, setBusy] = useState(false);
   async function refresh() { setRepos(repositorySchema.array().parse(await request('repositories'))); }
   useEffect(() => { let active = true; startSession().then(async result => { if (!active) return; setLimits(result); await refresh(); }).catch(error => { if (active) setError(message(error)); }); return () => { active = false; }; }, []);
@@ -81,7 +72,7 @@ export function LocalWorkspace() {
   const selected = repos.find(repo => repo.repository_id === params.get('repo'));
   const repo = selected && params.get('snapshot') ? { ...selected, snapshot_id: params.get('snapshot')!, commit_sha: params.get('snapshot')!.startsWith('github:') ? params.get('snapshot')!.slice(7) : null } : selected;
   const visibleRepos = repos.filter(item => item.name.toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase()));
-  return <div className="local-shell" data-reduced-motion={reducedMotion}>
+  return <div className="local-shell">
     <a className="skip-link" href="#main-content">Skip to content</a>
     <aside className="local-sidebar">
       <a href="/" className="local-brand"><img src="/brand/ariadne-mark.png" alt=""/><span>Ariadne</span></a>
@@ -92,7 +83,7 @@ export function LocalWorkspace() {
     </aside>
     <div className={`local-main${repo ? '' : ' local-home'}`}>
       {!repo && <Atmosphere/>}
-      <header className="local-topbar"><div className="local-breadcrumb"><a href="/">Workspace</a><span>/</span><strong>{repo?.name ?? 'Repositories'}</strong></div><div className="local-topbar-actions"><button className="local-motion-toggle" aria-label="Reduce motion" aria-pressed={reducedMotion} onClick={toggleMotion} title="Pause background motion"><LocalIcon name={reducedMotion ? 'play' : 'pause'}/><span>{reducedMotion ? 'Motion paused' : 'Pause motion'}</span></button><ThemeToggle compact/></div></header>
+      <header className="local-topbar"><div className="local-breadcrumb"><a href="/">Workspace</a><span>/</span><strong>{repo?.name ?? 'Repositories'}</strong></div><div className="local-topbar-actions"><ThemeToggle compact/></div></header>
       <main id="main-content" tabIndex={-1}>
         {error && <p className="local-error" role="alert">{error}</p>}
         {!limits ? <div className="local-loading" role="status"><span className="local-spinner"/>Opening your workspace…</div> : repo ? <RepositoryPanel key={`${repo.repository_id}:${repo.snapshot_id}`} repo={repo} limits={limits} refresh={() => { void refresh().catch(error => setError(message(error))); }}/> : <>

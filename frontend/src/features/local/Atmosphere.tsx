@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-// Coordinates follow the thread in the bundled 1536 × 1024 landscape.
-const thread = 'M660 690 C775 560 905 438 1058 438 S1325 458 1250 337 S1298 291 1285 210 S1283 167 1160 156 S1280 128 1330 111';
+// The filament and its light share one path through the new valley plate.
+const thread = 'M1080 824 C1000 780 867 761 930 715 S1150 659 1240 573 S1260 496 1172 450 S1256 361 1330 314 S1340 265 1270 238 S1317 184 1390 149';
 
 export function Atmosphere() {
   const scene = useRef<HTMLDivElement>(null);
@@ -23,11 +23,14 @@ export function Atmosphere() {
     <svg viewBox="0 0 1536 1024" preserveAspectRatio="xMaxYMin slice" className="local-landscape-art">
       <defs>
         <filter id="thread-glow"><feGaussianBlur stdDeviation="4"/></filter>
+        <filter id="valley-feather"><feGaussianBlur stdDeviation="45"/></filter>
+        <mask id="valley-mist"><path d={thread} fill="none" stroke="white" strokeWidth="180" filter="url(#valley-feather)"/></mask>
       </defs>
-      <image href="/brand/ariadne-landscape.png" width="1536" height="1024"/>
-      <g><image className="local-fog local-fog-near" href="/brand/ariadne-mist.png" width="1536" height="1024"/><image className="local-fog local-fog-far" href="/brand/ariadne-mist.png" width="1536" height="1024"/></g>
+      <image href="/brand/ariadne-valley.png" width="1536" height="1024"/>
+      <path className="local-filament" d={thread}/>
       <path className="local-signal local-signal-glow" d={thread} pathLength="100" filter="url(#thread-glow)"/>
       <path className="local-signal" d={thread} pathLength="100"/>
+      <g mask="url(#valley-mist)"><image className="local-fog local-fog-near" href="/brand/ariadne-mist.png" width="1536" height="1024"/><image className="local-fog local-fog-far" href="/brand/ariadne-mist.png" width="1536" height="1024"/></g>
     </svg>
   </div>;
 }
