@@ -26,12 +26,17 @@ export function Atmosphere() {
         {/* Include the wide stroke and blur halo; the default path bounds clip them into a rectangle. */}
         <filter id="valley-feather" filterUnits="userSpaceOnUse" x="-300" y="-300" width="2136" height="1624"><feGaussianBlur stdDeviation="45"/></filter>
         <mask id="valley-mist" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2136" height="1624"><path d={thread} fill="none" stroke="white" strokeWidth="340" filter="url(#valley-feather)"/></mask>
+        <linearGradient id="fog-edge-x"><stop stopColor="white" stopOpacity="0"/><stop offset=".16" stopColor="white"/><stop offset=".8" stopColor="white"/><stop offset="1" stopColor="white" stopOpacity="0"/></linearGradient>
+        <linearGradient id="fog-edge-y" x2="0" y2="1"><stop stopColor="white" stopOpacity="0"/><stop offset=".18" stopColor="white"/><stop offset=".8" stopColor="white"/><stop offset="1" stopColor="white" stopOpacity="0"/></linearGradient>
+        <mask id="fog-texture-x" maskUnits="userSpaceOnUse" x="0" y="0" width="1536" height="1024"><rect width="1536" height="1024" fill="url(#fog-edge-x)"/></mask>
+        <mask id="fog-texture-y" maskUnits="userSpaceOnUse" x="0" y="0" width="1536" height="1024"><rect width="1536" height="1024" fill="url(#fog-edge-y)"/></mask>
       </defs>
       <image href="/brand/ariadne-valley.png" width="1536" height="1024"/>
       <path className="local-filament" d={thread}/>
       <path className="local-signal local-signal-glow" d={thread} pathLength="100" filter="url(#thread-glow)"/>
       <path className="local-signal" d={thread} pathLength="100"/>
-      <g mask="url(#valley-mist)"><image className="local-fog local-fog-near" href="/brand/ariadne-mist.png" width="1536" height="1024"/><image className="local-fog local-fog-far" href="/brand/ariadne-mist.png" width="1536" height="1024"/></g>
+      {/* Feather the texture itself before moving it, so its canvas edges can never drift into view. */}
+      <g mask="url(#valley-mist)">{['near', 'far'].map(layer => <g key={layer} className={`local-fog local-fog-${layer}`}><g mask="url(#fog-texture-y)"><image mask="url(#fog-texture-x)" href="/brand/ariadne-mist.png" width="1536" height="1024"/></g></g>)}</g>
     </svg>
   </div>;
 }
