@@ -24,7 +24,7 @@ export function Atmosphere() {
       <defs>
         <filter id="thread-glow"><feGaussianBlur stdDeviation="4"/></filter>
         <filter id="valley-feather"><feGaussianBlur stdDeviation="45"/></filter>
-        <mask id="valley-mist"><path d={thread} fill="none" stroke="white" strokeWidth="180" filter="url(#valley-feather)"/></mask>
+        <mask id="valley-mist"><path d={thread} fill="none" stroke="white" strokeWidth="340" filter="url(#valley-feather)"/></mask>
       </defs>
       <image href="/brand/ariadne-valley.png" width="1536" height="1024"/>
       <path className="local-filament" d={thread}/>

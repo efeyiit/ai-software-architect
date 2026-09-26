@@ -153,14 +153,15 @@
 .local-home::before{display:none}
 .local-landscape{position:absolute;inset:0 0 auto;height:640px;z-index:-1;pointer-events:none;overflow:hidden;opacity:.48;mask-image:linear-gradient(90deg,transparent,#000 72%),linear-gradient(#000 55%,transparent);mask-composite:intersect}
 .local-landscape-art{width:100%;height:100%;display:block}
-[data-theme="dark"] .local-landscape{opacity:.95;mask-image:linear-gradient(#000 55%,transparent);mask-composite:add}
-.local-fog{opacity:.28;transform-origin:80% 25%;animation:local-fog-drift 26s cubic-bezier(.45,0,.55,1) infinite;will-change:transform}
-.local-fog-far{opacity:.18;animation-duration:37s;animation-delay:-18s;animation-direction:reverse}
+[data-theme="dark"] .local-landscape{opacity:.68;mask-image:linear-gradient(#000 35%,transparent 95%);mask-composite:add}
+.local-landscape::after{content:'';position:absolute;inset:0;pointer-events:none;backdrop-filter:blur(9px);background:color-mix(in srgb,var(--canvas) 22%,transparent);mask-image:radial-gradient(ellipse at 78% 27%,transparent 5%,#000 65%)}
+.local-fog{opacity:.48;transform-origin:80% 40%;animation:local-fog-drift 18s linear infinite;animation-delay:-5s;will-change:transform}
+.local-fog-far{opacity:.3;animation-duration:25s;animation-delay:-17s;animation-direction:reverse}
 .local-signal{fill:none;stroke:#e1fff4;stroke-width:2;stroke-linecap:round;stroke-dasharray:3 97;stroke-dashoffset:5;animation:local-thread-flow 14s linear infinite;opacity:0}
 .local-signal-glow{stroke:#83fbd1;stroke-width:9}
 .local-filament{fill:none;stroke:#9edfcf;stroke-width:1.2;opacity:.45}
 @keyframes local-thread-flow{0%{stroke-dashoffset:5;opacity:0}8%{opacity:.85}85%{opacity:.85}100%{stroke-dashoffset:-100;opacity:0}}
-@keyframes local-fog-drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(17px,-9px) scale(1.025)}}
+@keyframes local-fog-drift{0%,100%{transform:translate(-35px,8px) scale(1.03)}25%{transform:translate(0,-18px) scale(1.045)}50%{transform:translate(42px,-8px) scale(1.06)}75%{transform:translate(8px,18px) scale(1.045)}}
 .local-landscape[data-paused=true] *{animation-play-state:paused!important}
 .local-shell[data-reduced-motion=true] .local-signal{display:none}
 .local-shell[data-reduced-motion=true] .local-fog{animation:none!important}
