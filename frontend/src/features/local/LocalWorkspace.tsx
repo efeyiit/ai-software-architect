@@ -8,6 +8,7 @@ import { SourceText } from './SourceText';
 import { loadReport, query, repositorySchema, request, sourceHref, startSession, type Job, type Limits, type LocalRepository } from './api';
 import { LocalIcon, revealStyle } from './LocalIcon';
 import './local.css';
+import { Atmosphere } from './Atmosphere';
 
 const views = ['Overview', 'Files', 'Architecture', 'Dependencies', 'Findings', 'Security', 'Testing', 'Refactoring', 'Documentation', 'AI chat'];
 const message = (error: unknown) => error instanceof Error ? error.message : 'The request failed.';
@@ -63,6 +64,7 @@ export function LocalWorkspace() {
   const [error, setError] = useState('');
   const [url, setUrl] = useState('');
   const [filter, setFilter] = useState('');
+  const [sourceKind, setSourceKind] = useState<'github' | 'local'>('github');
   const [reducedMotion, setReducedMotion] = useState(() => {
     try { const saved = localStorage.getItem('ariadne:reduced-motion'); if (saved !== null) return saved === 'true'; } catch { /* A session preference still works. */ }
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -82,33 +84,36 @@ export function LocalWorkspace() {
   return <div className="local-shell" data-reduced-motion={reducedMotion}>
     <a className="skip-link" href="#main-content">Skip to content</a>
     <aside className="local-sidebar">
-      <a href="/" className="local-brand"><img src="/brand/02-iplik.png" alt=""/><span>Ariadne<span className="local-brand-caption">Follow the thread.</span></span></a>
+      <a href="/" className="local-brand"><img src="/brand/ariadne-mark.png" alt=""/><span>Ariadne</span></a>
       <a className="local-workspace-link" href="/" aria-current={!repo ? 'page' : undefined}><LocalIcon name="grid"/><span>Workspace</span><span className="local-count">{repos.length}</span></a>
       <p className="local-nav-label">Repositories</p>
-      <nav aria-label="Saved repositories">{repos.map(item => <a key={item.repository_id} href={`/?${new URLSearchParams({repo: item.repository_id})}`} aria-current={item.repository_id === repo?.repository_id ? 'page' : undefined}><LocalIcon name={item.source_kind === 'github' ? 'branch' : 'folder'}/><span>{item.name}<small>{item.source_kind === 'github' ? 'Public GitHub' : 'Local source'}</small></span></a>)}</nav>
+      <nav aria-label="Saved repositories">{repos.map(item => <a key={item.repository_id} href={`/?${new URLSearchParams({repo: item.repository_id})}`} aria-current={item.repository_id === repo?.repository_id ? 'page' : undefined}><LocalIcon name={item.source_kind === 'github' ? 'github' : 'folder'}/><span>{item.name}<small>{item.source_kind === 'github' ? 'Public GitHub' : 'Local source'}</small></span></a>)}</nav>
       <div className="local-sidebar-note"><LocalIcon name="monitor"/><div>On your computer<p><span className="status-dot"/> No account required</p></div></div>
     </aside>
     <div className={`local-main${repo ? '' : ' local-home'}`}>
-      <header className="local-topbar"><div className="local-breadcrumb"><a href="/">Workspace</a><span>/</span><strong>{repo?.name ?? 'Repositories'}</strong></div><div className="local-topbar-actions"><button className="local-motion-toggle" aria-label="Reduce motion" aria-pressed={reducedMotion} onClick={toggleMotion} title="Reduce motion"><LocalIcon name="spark"/><span>Reduce motion</span></button><ThemeToggle/></div></header>
+      {!repo && <Atmosphere/>}
+      <header className="local-topbar"><div className="local-breadcrumb"><a href="/">Workspace</a><span>/</span><strong>{repo?.name ?? 'Repositories'}</strong></div><div className="local-topbar-actions"><button className="local-motion-toggle" aria-label="Reduce motion" aria-pressed={reducedMotion} onClick={toggleMotion} title="Pause background motion"><LocalIcon name={reducedMotion ? 'play' : 'pause'}/><span>{reducedMotion ? 'Motion paused' : 'Pause motion'}</span></button><ThemeToggle compact/></div></header>
       <main id="main-content" tabIndex={-1}>
         {error && <p className="local-error" role="alert">{error}</p>}
         {!limits ? <div className="local-loading" role="status"><span className="local-spinner"/>Opening your workspace…</div> : repo ? <RepositoryPanel key={`${repo.repository_id}:${repo.snapshot_id}`} repo={repo} limits={limits} refresh={() => { void refresh().catch(error => setError(message(error))); }}/> : <>
           <div className="local-hero">
-            <div><h1>Your code,<br/><span>untangled.</span></h1><p>Open a project. See how it fits together.</p></div>
+            <div><h1>Take a look around<br/>your project.</h1><p>Bring in a repository to explore its files, see what connects them,<br className="local-desktop-break"/> and find the parts that could use some attention.</p></div>
+            <p className="local-margin-note" aria-hidden="true">Explore<br/>Understand<br/>Follow<br/>Further<span/></p>
           </div>
           <div className="local-import-grid">
-            <section className="local-import-section"><div className="local-import-title"><h2>Start with a GitHub link</h2><p>Any public repository. No sign-in needed.</p></div>
+            <div className="local-source-switch"><h2>What are you working on?</h2><div role="group" aria-label="Project source"><button aria-pressed={sourceKind === 'github'} onClick={() => setSourceKind('github')}><LocalIcon name="github"/>GitHub repository</button><button aria-pressed={sourceKind === 'local'} onClick={() => setSourceKind('local')}><LocalIcon name="folder"/>Folder on this computer</button></div></div>
+            <section className="local-import-section" hidden={sourceKind !== 'github'}><div className="local-import-title"><p>Paste a public repository link to get started.</p></div>
               <form onSubmit={async event => { event.preventDefault(); setBusy(true); setError(''); try { const imported = repositorySchema.parse(await request('github', { github_url: url })); window.location.assign(`/?${new URLSearchParams({repo: imported.repository_id})}`); } catch (error) { setError(message(error)); } finally { setBusy(false); } }}>
-                <label className="local-sr-only" htmlFor="github-url">GitHub repository URL</label><div className="local-url-entry"><LocalIcon name="branch"/><input id="github-url" type="url" placeholder="https://github.com/owner/repository" required value={url} disabled={busy} aria-busy={busy} onChange={event => setUrl(event.target.value)}/>
+                <label className="local-sr-only" htmlFor="github-url">GitHub repository URL</label><div className="local-url-entry"><LocalIcon name="github"/><input id="github-url" type="url" placeholder="https://github.com/owner/repository" required value={url} disabled={busy} aria-busy={busy} onChange={event => setUrl(event.target.value)}/>
                 <button className="local-primary" disabled={busy} aria-busy={busy}>{busy ? <><span className="local-spinner"/>Importing…</> : <>Open repository<LocalIcon name="arrow"/></>}</button></div>
               </form>
             </section>
-            <section className="local-import-section"><div className="local-import-title"><h2>Or open a folder</h2></div><FolderImport limits={limits} imported={() => { void refresh().catch(error => setError(message(error))); }}/></section>
+            <section className="local-import-section" hidden={sourceKind !== 'local'}><div className="local-import-title"><p>Choose a project folder, including a private repository.</p></div><FolderImport limits={limits} imported={() => { void refresh().catch(error => setError(message(error))); }}/></section>
           </div>
           <section className="local-library" aria-labelledby="repository-list-title">
             <div className="local-section-heading"><h2 id="repository-list-title">Your repositories <span className="local-count">{repos.length}</span></h2><label className="local-search"><LocalIcon name="search"/><span className="local-sr-only">Search repositories</span><input type="search" placeholder="Find a repository…" value={filter} onChange={event => setFilter(event.target.value)}/></label></div>
             {visibleRepos.length ? <div className="local-repo-grid">{visibleRepos.map((item, index) => <a className="local-repo-card" style={revealStyle(index)} href={`/?${new URLSearchParams({repo:item.repository_id})}`} key={item.repository_id}>
-              <span className="local-repo-symbol"><LocalIcon name={item.source_kind === 'github' ? 'branch' : 'folder'}/></span><div className="local-repo-name"><h3>{item.name}</h3><span>{item.source_kind === 'github' ? 'Public GitHub repository' : 'Local source folder'}</span></div><code className="local-revision">{item.commit_sha ? item.commit_sha.slice(0, 7) : item.snapshot_id.slice(6, 13)}<span>{item.commit_sha ? 'commit' : 'snapshot'}</span></code><LocalIcon name="arrow"/>
+              <span className="local-repo-symbol"><LocalIcon name={item.source_kind === 'github' ? 'github' : 'folder'}/></span><div className="local-repo-name"><h3>{item.name}</h3><span>{item.source_kind === 'github' ? 'Public GitHub repository' : 'Local source folder'}</span></div><code className="local-revision">{item.commit_sha ? item.commit_sha.slice(0, 7) : item.snapshot_id.slice(6, 13)}<span>{item.commit_sha ? 'commit' : 'snapshot'}</span></code><LocalIcon name="arrow"/>
             </a>)}</div> : <div className="local-empty"><LocalIcon name={filter ? 'search' : 'folder'}/><h3>{filter ? 'No matching repositories' : 'No projects yet'}</h3><p>{filter ? 'Try a different repository name.' : 'Import a GitHub repository or choose a source folder above.'}</p>{filter && <button className="local-secondary" onClick={() => setFilter('')}>Clear search</button>}</div>}
           </section>
         </>}

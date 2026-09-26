@@ -16,7 +16,7 @@ function initialTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-export function ThemeToggle() {
+export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const [feedback, setFeedback] = useState<{ id: number; message: string } | null>(null);
 
@@ -43,10 +43,12 @@ export function ThemeToggle() {
   }
 
   return <>
-    <button className="theme-toggle" type="button" aria-label="Dark mode" aria-pressed={theme === 'dark'} onClick={toggle}>
+    <button className={`theme-toggle${compact ? ' theme-toggle--compact' : ''}`} type="button" aria-label="Dark mode" aria-pressed={theme === 'dark'} onClick={toggle}>
+      {compact ? <><span className="theme-toggle__choice" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></span><span className="theme-toggle__choice" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg></span></> : <>
       <span className="theme-toggle__icon" aria-hidden="true">{theme === 'dark' ? '☾' : '☼'}</span>
       <span className="theme-toggle__track" aria-hidden="true"><span className="theme-toggle__thumb"/></span>
       <span>Dark mode</span>
+      </>}
     </button>
     {feedback && <span className="theme-feedback" role="status" key={feedback.id}><span className="theme-feedback__dot" aria-hidden="true"/>{feedback.message}</span>}
   </>;
