@@ -38,7 +38,6 @@ class LocalRuntime:
         self.store = store
         self._pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="local-analysis")
         self._lock = Lock()
-        self._jobs: dict[tuple[str, str], str] = {}
         self._stop: dict[str, Event] = {}
         self._closed = False
 
@@ -61,11 +60,9 @@ class LocalRuntime:
         with self._lock:
             if self._closed:
                 raise ValueError("runtime is closed")
-            key = repository_id, snapshot_id
-            if key in self._jobs:
-                existing = self.store.load_job(self._jobs[key])
-                if existing.status not in ("failed", "cancelled"):
-                    return existing
+            existing = self.store.latest_job(repository_id, snapshot_id)
+            if existing is not None and existing.status not in ("failed", "cancelled"):
+                return existing
             if sum(self.store.load_job(job_id).status in ("queued", "running")
                    for job_id in self._stop) >= 8:
                 raise ValueError("analysis queue is full")
@@ -74,9 +71,15 @@ class LocalRuntime:
                 raise KeyError("snapshot not found")
             job = StoredJob(job_id=str(uuid4()), repository_id=repository_id, snapshot_id=snapshot_id, status="queued")
             self.store.save_job(job)
-            self._jobs[key] = job.job_id
             self._stop[job.job_id] = Event()
-            self._pool.submit(self._run, job, source, self._stop[job.job_id])
+            try:
+                self._pool.submit(self._run, job, source, self._stop[job.job_id])
+            except Exception:
+                self._stop.pop(job.job_id, None)
+                job.status = "failed"
+                job.error_code = "ANALYSIS_FAILED"
+                self.store.save_job(job)
+                raise
             return job
 
     def _run(self, job: StoredJob, source: LocalSnapshot, stop: Event) -> None:
@@ -97,10 +100,15 @@ class LocalRuntime:
                     job.status = report.status
                     job.analysis_id = result.analysis_id
                 self.store.save_job(job)
+                self._stop.pop(job.job_id, None)
         except Exception:
-            job.status = "cancelled" if stop.is_set() else "failed"
-            job.error_code = None if stop.is_set() else "ANALYSIS_FAILED"
-            self.store.save_job(job)
+            with self._lock:
+                job.status = "cancelled" if stop.is_set() else "failed"
+                job.error_code = None if stop.is_set() else "ANALYSIS_FAILED"
+                try:
+                    self.store.save_job(job)
+                finally:
+                    self._stop.pop(job.job_id, None)
 
     def cancel(self, job_id: str) -> None:
         with self._lock:

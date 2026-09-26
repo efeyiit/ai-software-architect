@@ -80,6 +80,28 @@ def test_job_cannot_be_rebound_to_another_snapshot(tmp_path):
     assert store.load_job("one") == job
 
 
+def test_latest_job_is_scoped_and_old_updates_do_not_replace_new_attempt(tmp_path):
+    store = LocalStore(tmp_path / 'data.sqlite3')
+    old, new = snapshot(), snapshot('b')
+    other = old.model_copy(update={'repository_id': 'repo-2'})
+    for source in (old, new, other):
+        store.save_snapshot(source)
+    def job(name, source, status='queued'):
+        result = StoredJob(job_id=name, repository_id=source.repository_id,
+                           snapshot_id=source.snapshot_id, status=status)
+        store.save_job(result)
+        return result
+    first = job('first', old, 'failed')
+    retry = job('retry', old)
+    changed = job('changed', new)
+    separate = job('separate', other)
+    store.save_job(first.model_copy(update={'status': 'cancelled'}))
+    assert store.latest_job(old.repository_id, old.snapshot_id) == retry
+    assert store.latest_job(new.repository_id, new.snapshot_id) == changed
+    assert store.latest_job(other.repository_id, other.snapshot_id) == separate
+    assert store.latest_job('missing', old.snapshot_id) is None
+
+
 @pytest.mark.parametrize("updates", [
     {"snapshot_id": "a" * 40}, {"sources": {"../secret.py": "secret"}},
     {"sources": {"C:/secret.py": "secret"}}, {"sources": {"a\\b.py": "text"}},

@@ -38,6 +38,7 @@ class LocalStore:
                     FOREIGN KEY(repository_id, snapshot_id)
                     REFERENCES snapshots(repository_id, snapshot_id))""")
                 db.execute("PRAGMA user_version=1")
+            db.execute("CREATE INDEX IF NOT EXISTS jobs_snapshot ON jobs(repository_id, snapshot_id)")
 
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:
@@ -108,6 +109,12 @@ class LocalStore:
     def load_job(self, job_id: str) -> StoredJob | None:
         with self._connect() as db:
             row = db.execute("SELECT * FROM jobs WHERE job_id=?", (job_id,)).fetchone()
+        return StoredJob.model_validate(dict(row)) if row else None
+
+    def latest_job(self, repository_id: str, snapshot_id: str) -> StoredJob | None:
+        with self._connect() as db:
+            row = db.execute("SELECT * FROM jobs WHERE repository_id=? AND snapshot_id=? "
+                             "ORDER BY rowid DESC LIMIT 1", (repository_id, snapshot_id)).fetchone()
         return StoredJob.model_validate(dict(row)) if row else None
 
     def recover_interrupted_jobs(self) -> int:

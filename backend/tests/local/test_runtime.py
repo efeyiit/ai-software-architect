@@ -28,6 +28,34 @@ def test_real_local_analysis_has_content_identity_and_survives_restart(tmp_path)
         assert LocalStore(path).load_analysis(completed.analysis_id)["report"] == report
     finally:
         runtime.close()
+    assert not runtime._stop
+    restarted = LocalRuntime(LocalStore(path))
+    try:
+        assert restarted.analyze(source.repository_id, source.snapshot_id).job_id == completed.job_id
+    finally:
+        restarted.close()
+
+
+def test_failed_worker_releases_active_slot_and_can_retry(tmp_path, monkeypatch):
+    from app.local import runtime as module
+    def broken_material(source):
+        raise ValueError('invalid material')
+    monkeypatch.setattr(module, 'material_for', broken_material)
+    store = LocalStore(tmp_path / 'data.sqlite3')
+    source = import_files('Broken', [UploadedSource(path='main.py', content='x = 1')])
+    store.save_snapshot(source)
+    runtime = LocalRuntime(store)
+    try:
+        first = runtime.analyze(source.repository_id, source.snapshot_id)
+        deadline = monotonic() + 10
+        while store.load_job(first.job_id).status in ('queued', 'running') and monotonic() < deadline:
+            sleep(.02)
+        assert store.load_job(first.job_id).status == 'failed'
+        with runtime._lock:
+            assert first.job_id not in runtime._stop
+        assert runtime.analyze(source.repository_id, source.snapshot_id).job_id != first.job_id
+    finally:
+        runtime.close()
 
 
 def test_public_reader_preserves_real_commit_without_credentials(tmp_path):
@@ -92,3 +120,25 @@ def test_cancelled_queue_slots_remain_bounded_and_terminal_jobs_can_retry(tmp_pa
     retried = runtime.analyze(job.repository_id, job.snapshot_id)
     assert retried.job_id != job.job_id
     runtime.close()
+
+
+def test_submission_failure_does_not_leave_a_queued_job_or_active_slot(tmp_path):
+    import pytest
+    class RejectedPool:
+        def submit(self, *args):
+            raise RuntimeError('executor unavailable')
+        def shutdown(self, **kwargs):
+            pass
+    store = LocalStore(tmp_path / 'data.sqlite3')
+    source = import_files('Example', [UploadedSource(path='main.py', content='x = 1')])
+    store.save_snapshot(source)
+    runtime = LocalRuntime(store)
+    runtime._pool.shutdown()
+    runtime._pool = RejectedPool()
+    try:
+        with pytest.raises(RuntimeError, match='executor unavailable'):
+            runtime.analyze(source.repository_id, source.snapshot_id)
+        assert not runtime._stop
+        assert store.latest_job(source.repository_id, source.snapshot_id).status == 'failed'
+    finally:
+        runtime.close()
